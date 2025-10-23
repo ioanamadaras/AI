@@ -87,17 +87,109 @@ def depthFirstSearch(problem: SearchProblem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()  # obținem starea de start
+
+    # dacă startul este deja o stare goal (țintă), returnăm lista goală
+    if problem.isGoalState(start):
+        return []
+
+    frontier = util.Stack()  # stiva frontieră (conține stări de explorat)
+    # fiecare element din frontieră este un tuplu: (stare_curentă, listă_acțiuni)
+    frontier.push((start, []))
+    explored = set()  # mulțime pentru a ține evidența stărilor deja vizitate
+
+    # cât timp avem stări neexplorate în frontieră
+    while not frontier.isEmpty():
+        state, path = frontier.pop()  # extragem ultima stare adăugată (LIFO)
+
+        # dacă am mai vizitat această stare, o ignorăm
+        if state in explored:
+            continue
+        explored.add(state)  # marcăm starea ca vizitată
+
+        # verificăm dacă am ajuns la scop
+        if problem.isGoalState(state):
+            return path  # returnăm calea acțiunilor până aici
+
+        # pentru fiecare succesor al stării curente
+        for successor, action, stepCost in problem.getSuccessors(state):
+            if successor not in explored:
+                # adăugăm succesorul în frontieră, cu calea actualizată
+                frontier.push((successor, path + [action]))
+
+    # dacă nu s-a găsit niciun drum
+    return []
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+
+    if problem.isGoalState(start):
+        return []
+
+    frontier = util.Queue()  # coadă pentru explorare strat cu strat
+    frontier.push((start, []))  # adăugăm starea de start și calea goală
+    explored = set()  # stări deja vizitate
+    frontier_set = {start}  # ținem o copie a frontierii pentru eficiență
+
+    while not frontier.isEmpty():
+        state, path = frontier.pop()  # extragem prima stare adăugată (FIFO)
+        frontier_set.discard(state)   # o eliminăm din setul frontierii
+
+        if state in explored:
+            continue
+        explored.add(state)
+
+        if problem.isGoalState(state):
+            return path  # am găsit drumul către scop
+
+        for successor, action, stepCost in problem.getSuccessors(state):
+            # adăugăm doar stările care nu sunt vizitate sau deja în frontieră
+            if successor not in explored and successor not in frontier_set:
+                frontier.push((successor, path + [action]))
+                frontier_set.add(successor)
+
+    return []
+
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+
+    if problem.isGoalState(start):
+        return []
+
+    frontier = util.PriorityQueue()
+    # în frontieră reținem tupluri: (stare, cale, cost_total)
+    frontier.push((start, [], 0), 0)  # prioritatea este costul total (g)
+    best_cost = {start: 0}  # dicționar pentru costul minim cunoscut al fiecărei stări
+
+    while not frontier.isEmpty():
+        state, path, cost = frontier.pop()  # extragem starea cu cost minim
+
+        # dacă avem deja un drum mai ieftin către această stare, o ignorăm
+        if state in best_cost and cost > best_cost[state]:
+            continue
+
+        # dacă am ajuns la scop, returnăm calea
+        if problem.isGoalState(state):
+            return path
+
+        # generăm succesorii stării curente
+        for successor, action, stepCost in problem.getSuccessors(state):
+            new_cost = cost + stepCost  # actualizăm costul total până la succesor
+
+            # verificăm dacă avem un drum mai bun (mai ieftin) către succesor
+            if successor not in best_cost or new_cost < best_cost[successor]:
+                best_cost[successor] = new_cost  # actualizăm costul minim cunoscut
+                # inserăm succesorul în frontieră cu prioritate = cost_total
+                frontier.push((successor, path + [action], new_cost), new_cost)
+
+    # dacă nu s-a găsit nicio soluție
+    return []
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -109,7 +201,42 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+
+    if problem.isGoalState(start):
+        return []
+
+    frontier = util.PriorityQueue()
+    g_start = 0  # costul de la start până la nodul curent
+    f_start = g_start + heuristic(start, problem)  # valoarea totală f = g + h
+    # fiecare element: (stare, cale, cost_g)
+    frontier.push((start, [], g_start), f_start)
+
+    best_g = {start: 0}  # dicționar cu cel mai bun cost g pentru fiecare stare
+
+    while not frontier.isEmpty():
+        state, path, g = frontier.pop()
+
+        # dacă am găsit un drum mai ieftin ulterior, ignorăm acest nod
+        if state in best_g and g > best_g[state]:
+            continue
+
+        # verificăm dacă am ajuns la scop
+        if problem.isGoalState(state):
+            return path
+
+        # explorăm succesorii
+        for successor, action, stepCost in problem.getSuccessors(state):
+            new_g = g + stepCost  # noul cost g pentru succesor
+
+            # verificăm dacă e o cale mai ieftină decât cea cunoscută
+            if successor not in best_g or new_g < best_g[successor]:
+                best_g[successor] = new_g  # actualizăm costul g minim
+                f = new_g + heuristic(successor, problem)  # calculăm noul f = g + h
+                # inserăm succesorul cu prioritate egală cu f
+                frontier.push((successor, path + [action], new_g), f)
+
+    return []  # dacă nu am găsit soluție
 
 
 # Abbreviations

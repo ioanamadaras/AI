@@ -1,0 +1,18 @@
+{
+    "scripts": {
+        "DFS_small": "python3 pacman.py -l smallMaze -p SearchAgent -a fn=dfs",
+        "BFS_small": "python3 pacman.py -l smallMaze -p SearchAgent -a fn=bfs",
+        "UCS_small": "python3 pacman.py -l smallMaze -p SearchAgent -a fn=ucs",
+        "aSTAR_small": "python3 pacman.py -l smallMaze -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic",
+
+        "DFS_medium": "python3 pacman.py -l mediumMaze -p SearchAgent -a fn=dfs",
+        "BFS_medium": "python3 pacman.py -l mediumMaze -p SearchAgent -a fn=bfs",
+        "UCS_medium": "python3 pacman.py -l mediumMaze -p SearchAgent -a fn=ucs",
+        "aSTAR_medium": "python3 pacman.py -l mediumMaze -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic",
+
+        "DFS_hard": "python3 pacman.py -l openMaze -p SearchAgent -a fn=dfs",
+        "BFS_hard": "python3 pacman.py -l openMaze -p SearchAgent -a fn=bfs",
+        "UCS_hard": "python3 pacman.py -l openMaze -p SearchAgent -a fn=ucs",
+        "aSTAR_hard": "python3 pacman.py -l openMaze -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic"
+    }
+}
