@@ -17,6 +17,7 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from game import Actions
 import util
 
 class SearchProblem:
@@ -59,7 +60,20 @@ class SearchProblem:
         This method returns the total cost of a particular sequence of actions.
         The sequence must be composed of legal moves.
         """
-        util.raiseNotDefined()
+        MAX = 999999
+        if actions is None:
+            return MAX
+
+        x, y = self.startingPosition
+        for action in actions:
+            dx, dy = Actions.directionToVector(action)
+            x = int(x + dx)
+            y = int(y + dy)
+
+            if self.walls[x][y]:
+                return MAX
+
+        return len(actions)
 
 
 def tinyMazeSearch(problem):

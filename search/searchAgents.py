@@ -285,16 +285,17 @@ class CornersProblem(search.SearchProblem):
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
-        for corner in self.corners:
-            if not startingGameState.hasFood(*corner):
-                print('Warning: no food in corner ' + str(corner))
+
+        self.startState = (self.startingPosition, tuple())
+
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
 
     def getStartState(self):
         return self.startState
 
     def isGoalState(self, state: Any):
-        return len(state.visited) == 4  # goal reached if all 4 corners visited
+        pos, visited = state
+        return len(visited) == 4  # goal reached if all 4 corners visited
 
     def getSuccessors(self, state: Any):
         """
@@ -318,7 +319,9 @@ class CornersProblem(search.SearchProblem):
                 newVisited = list(visited)
                 if nextPos in self.corners and nextPos not in visited:
                     newVisited.append(nextPos)
+
                 successors.append(((nextPos, tuple(newVisited)), action, 1))
+
         self._expanded += 1
         return successors
 
